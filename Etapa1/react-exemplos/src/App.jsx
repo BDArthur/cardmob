@@ -5,6 +5,10 @@ import "./App.css";
 import Counter from "./components/Counter";
 import Photo from "./components/photo";
 import Album from "./components/album";
+<<<<<<< HEAD
+=======
+import TodoList from "./components/TodoList";
+>>>>>>> 65950c6 (add FotoList component)
 
 function App() {
   const [count, setCount] = useState(0);
@@ -34,6 +38,10 @@ function App() {
 
   return (
     <>
+<<<<<<< HEAD
+=======
+      <TodoList name="CARDMOB"/>
+>>>>>>> 65950c6 (add FotoList component)
       <Counter title="Contando..."/>
       <Counter initial="100"/>
       {/* <article>
@@ -54,3 +62,7 @@ function App() {
 }
 
 export default App;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 65950c6 (add FotoList component)
