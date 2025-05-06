@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
  
  import Photo from "./Photo";
  
+ 
  const Album = ({ albumId }) => {
      const [photos, setPhotos] = useState([]);
  
