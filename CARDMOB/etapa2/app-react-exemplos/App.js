@@ -1,235 +1,268 @@
-import React, { useState, useEffect } from 'react'; // novo: useEffect
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, Image, TextInput, FlatList, Alert } from 'react-native'; // novo: Alert
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+  FlatList,
+  Alert,
+  Image,
+} from "react-native";
 
-import ScrollViewExample from './components/ScrollViewExamples';
+const BASE_URL = "http://10.81.205.9:5000";
 
 export default function App() {
- 
-  const [items, setItems] = useState([]);
-  const [text, setText] = useState('');
-  const [editItemId, setEditItemId] = useState(null);
-  const [editItemText, setEditItemText] = useState('');
-  // loading ... efeito de carregando...
-  const [loading, setLoading] = useState(false); // novo
+  const [catalog, setCatalog] = useState([]);
+  const [nome, setNome] = useState("");
+  const [preco, setPreco] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [editandoId, setEditandoId] = useState(null);
+  const [editNome, setEditNome] = useState("");
+  const [editPreco, setEditPreco] = useState("");
+  const [editDescricao, setEditDescricao] = useState("");
 
-  // Buscar tudo.
-  const fetchItems = async () => {
-    setLoading(true);
+  const fetchCatalog = async () => {
     try {
-      // executa o que precisa, se der erro entra no catch.
-      const response = await fetch(`${BASE_URL}/items`);
-      const data = await response.json();
-      console.log(JSON.stringify(data)); // debug
-      setItems(data);
-
+      const res = await fetch(`${BASE_URL}/api/catalog?page=1`);
+      const data = await res.json();
+      setCatalog(data.catalog);
     } catch (error) {
-      // quando ocorre algum erro.
-      console.error('Error fetching items:', error);
+      console.error("Erro ao buscar catálogo:", error);
     }
-    finally {
-      setLoading(false);
-    }
-  }
+  };
 
   useEffect(() => {
-    fetchItems();
-  }, [])
+    fetchCatalog();
+  }, []);
 
-
-  // CREATE
-  const addItem = async () => {
-    if (text.trim() === '') {
+  const adicionarItem = async () => {
+    if (!nome.trim() || !preco.trim() || !descricao.trim()) {
+      Alert.alert("Atenção", "Preencha todos os campos.");
       return;
     }
+
     try {
-      const response = await fetch(`${BASE_URL}/items`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({text: text.trim()}),
+      await fetch(`${BASE_URL}/api/catalog`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: nome.trim(),
+          price: parseFloat(preco),
+          description: descricao.trim(),
+        }),
       });
-      if (response.ok) {
-        await fetchItems();
-        setText('');
-      }
-      else {
-        console.error('Failed to add item:', response.status);
-      }
-    } 
-    catch (error) {
-      console.error('Error adding item:', error);
+      setNome("");
+      setPreco("");
+      setDescricao("");
+      fetchCatalog();
+    } catch (error) {
+      console.error("Erro ao adicionar item:", error);
+    }
+  };
+
+  const atualizarItem = async (id) => {
+    if (!editNome.trim() || !editPreco.trim() || !editDescricao.trim()) {
+      Alert.alert("Atenção", "Preencha todos os campos.");
+      return;
     }
 
-  }
-  const updateItem = async (id) => {
     try {
-      const response = await fetch(`${BASE_URL}/items/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({text: editItemText}),
+      await fetch(`${BASE_URL}/api/catalog/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editNome.trim(),
+          price: parseFloat(editPreco),
+          description: editDescricao.trim(),
+        }),
       });
-      if (response.ok) {
-        await fetchItems();
-        setEditItemId(null);
-        setEditItemText('');
-      }
-      else {
-        console.error('Failed to update item:', response.status);
-      }
+      setEditandoId(null);
+      setEditNome("");
+      setEditPreco("");
+      setEditDescricao("");
+      fetchCatalog();
+    } catch (error) {
+      console.error("Erro ao atualizar item:", error);
     }
-    catch (error) {
-      console.error('Error updating item:', error)
+  };
+
+  const deletarItem = (id) => {
+    Alert.alert("Confirmar", "Deseja apagar este item?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Apagar",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await fetch(`${BASE_URL}/api/catalog/${id}`, {
+              method: "DELETE",
+            });
+            fetchCatalog();
+          } catch (error) {
+            console.error("Erro ao deletar item:", error);
+          }
+        },
+      },
+    ]);
+  };
+
+  const renderItem = ({ item }) => {
+    if (item.id === editandoId) {
+      return (
+        <View style={styles.itemEditando}>
+          <TextInput
+            style={styles.input}
+            value={editNome}
+            onChangeText={setEditNome}
+            placeholder="Nome"
+          />
+          <TextInput
+            style={styles.input}
+            value={editPreco}
+            onChangeText={setEditPreco}
+            placeholder="Preço"
+            keyboardType="decimal-pad"
+          />
+          <TextInput
+            style={styles.input}
+            value={editDescricao}
+            onChangeText={setEditDescricao}
+            placeholder="Descrição"
+          />
+          <Button title="Salvar" onPress={() => atualizarItem(item.id)} />
+        </View>
+      );
     }
 
-  }
-
-  // DELETE
-  const deleteItem = async (id) => {
-    Alert.alert(
-      'Confirm Delete',
-      'Are you sure you want to delete this item ?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete',
-          onPress: async () => {
-            try {
-              const response = await fetch(`${BASE_URL}/items/${id}`, {
-                method: 'DELETE'
-              });
-              if (response.ok) {
-                await fetchItems();
-              }
-              else {
-                console.error('Failed to delete item:', response.status);
-              }
-            }
-            catch (error) {
-              console.error('Error deleting item:', error);
-            }
-          }, 
-        }
-      ],
-      { cancelable: true }
+    return (
+      <View style={styles.item}>
+        {item.image ? (
+          <Image source={{ uri: item.image }} style={styles.image} />
+        ) : null}
+        <View style={{ flex: 1 }}>
+          <Text style={styles.itemText}>{item.name}</Text>
+          <Text style={styles.itemText}>R$ {item.price.toFixed(2)}</Text>
+          <Text style={styles.itemDescricao}>{item.description}</Text>
+        </View>
+        <View style={styles.buttonsVertical}>
+          <View style={styles.buttonSpacing}>
+            <Button
+              title="Editar"
+              color="#007bff"
+              onPress={() => {
+                setEditandoId(item.id);
+                setEditNome(item.name);
+                setEditPreco(item.price.toString());
+                setEditDescricao(item.description);
+              }}
+            />
+          </View>
+          <Button
+            title="Excluir"
+            color="#dc3545"
+            onPress={() => deletarItem(item.id)}
+          />
+        </View>
+      </View>
     );
   };
 
-  // READ -> um único item e/ou lista de itens
-  const renderItem = ({item}) => {
-    if (item.id != editItemId) {
-      return (
-        <View style={styles.item}>
-          <Text style={styles.itemText}>{item.text}</Text>
-          <View style={styles.buttons}>
-            <Button title='Edit' onPress={() => {setEditItemId(item.id)}}></Button>
-            <Button title='Delete' onPress={() => {deleteItem(item.id)}}></Button>
-          </View>
-        </View>
-      );
-
-    } else {
-      // Um item esta sendo editado
-      return (
-        <View style={styles.item}>
-          <TextInput 
-            style={styles.editInput}
-            onChangeText={setEditItemText}
-            value={editItemText}
-            autoFocus
-          />
-          <Button title='Update' onPress={() => updateItem(item.id)}></Button>
-        </View>
-      );
-    }
-  }
-
   return (
     <View style={styles.container}>
-      <ScrollViewExample />
-      <TextInput 
+      <Text style={styles.title}>Catálogo de Produtos</Text>
+
+      <TextInput
         style={styles.input}
-        value={text}
-        onChangeText={setText}
-        placeholder='Enter text item'
+        value={nome}
+        onChangeText={setNome}
+        placeholder="Nome do produto"
       />
-      <Button 
-        title='Add Item'
-        onPress={addItem}
+      <TextInput
+        style={styles.input}
+        value={preco}
+        onChangeText={setPreco}
+        placeholder="Preço"
+        keyboardType="decimal-pad"
       />
+      <TextInput
+        style={styles.input}
+        value={descricao}
+        onChangeText={setDescricao}
+        placeholder="Descrição"
+      />
+      <View style={styles.buttonSpacing}>
+        <Button title="Adicionar Produto" onPress={adicionarItem} />
+      </View>
+
       <FlatList
-        data={items}
+        data={catalog}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
-        style={styles.list}
+        style={{ marginTop: 20 }}
       />
-      <Text style={styles.text}>Olá App React Native - Atualiza!</Text>
-      <Image 
-        source={{uri: "https://picsum.photos/200"}}
-        style={{width: 200, height: 200}}
-      />
-
-      <StatusBar style="auto" />
-      {/* <Text style={styles.text}>Counter: {counter}</Text>
-
-      <View style={styles.buttonContainer}>
-        <Button title='Increment' onPress={incrementCounter} />
-        <Button title='Decrement' onPress={decrementCounter} />
-      </View> */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    flex: 1,
-    padding: 20,
     marginTop: 60,
+    padding: 20,
+    flex: 1,
+    backgroundColor: "#f9f9f9",
   },
-  text: {
-    fontSize: 24,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
+    textAlign: "center",
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
+    height: 45,
+    borderColor: "#ccc",
     borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  list: {
-    marginTop: 20,
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: "#fff",
   },
   item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 600,
-    marginTop: 150,
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    backgroundColor: "#e9ecef",
+    padding: 15,
+    borderRadius: 10,
+    gap: 12,
+  },
+  itemEditando: {
+    backgroundColor: "#fff3cd",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 12,
   },
   itemText: {
-    flex: 1,
+    fontSize: 16,
+    color: "#333",
+  },
+  itemDescricao: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 4,
+  },
+  buttonsVertical: {
+    flexDirection: "column",
+    gap: 8,
+  },
+  buttonSpacing: {
+    marginBottom: 8,
+  },
+  image: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
     marginRight: 10,
   },
-  buttons: {
-    flexDirection: 'row',
-  },
-  editInput: {
-    flex: 1,
-    marginRight: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-  }
 });
