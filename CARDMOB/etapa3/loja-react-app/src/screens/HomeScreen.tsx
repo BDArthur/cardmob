@@ -1,18 +1,18 @@
 import React from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
-import { useTheme } from '../contexts/ThemeContext'; // Assumindo que esse hook está implementado corretamente
+import { View, Text, Button, StyleSheet } from "react-native";
+import { useTheme } from "../contexts/ThemeContext";
 
-function HomeScreen() {
+function HomeScreen({ navigation }: any) {
     const { theme, toggleTheme } = useTheme();
 
     return (
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-            <Text style={{ color: theme.colors.text, marginBottom: theme.spacing(1) }}>Home Screen</Text>
-            <Button
-                title="Alternar tema"
-                color={theme.colors.primary}
-                onPress={toggleTheme}
-            />
+            <Text style={{ color: theme.colors.text, marginBottom: theme.spacing(1) }}>
+                Home Screen
+            </Text>
+            <Button title="Alternar Tema" color={theme.colors.primary} onPress={toggleTheme} />
+            <Button title="Ir para Detalhes" onPress={() => navigation.navigate("Details")} />
+            <Button title="Login" onPress={() => navigation.navigate("Login")} />
         </View>
     );
 }
@@ -22,7 +22,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
 });
