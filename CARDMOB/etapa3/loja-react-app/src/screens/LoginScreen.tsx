@@ -1,6 +1,5 @@
 import React, { use, useState } from "react";
 import { View, TextInput, Button, StyleSheet, Text, SafeAreaView} from "react-native";
-
 import { requestLogin } from "../service/authService";
 import { useAuth } from "../contexts/AuthContext";
 
