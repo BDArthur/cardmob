@@ -1,4 +1,4 @@
-mport React from "react";
+import React from "react";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -12,10 +12,11 @@ import HomeScreen from "../screens/HomeScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import LoginScreen from "../screens/LoginScreen";
 import CatalogScreen from "../screens/catalog/CatalogScreen";
+import CartScreen from "../screens/cart/CartScreen";
 
 const AppStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
-
+@@ -19,53 +20,61 @@
 function TabNavigator() {
     return (
         <Tab.Navigator
@@ -24,6 +25,9 @@ function TabNavigator() {
                 let iconName;
                 if (route.name === "Catalog") {
                   iconName = focused ? "tags" : "tags";
+                }
+                if (route.name === "Cart") {
+                  iconName = focused ? "shopping-cart" : "shopping-cart";
                 }
                 return <FontAwesome name={iconName} size={size} color={color} />
               },
@@ -37,6 +41,11 @@ function TabNavigator() {
               component={CatalogScreen}
               options={{title: 'Menu'}}
               />
+            <Tab.Screen
+              name="Cart"
+              component={CartScreen}
+              options={{title: 'Seu Carrinho'}}
+            />
             <Tab.Screen name="Settings" component={HomeScreen} />
             <Tab.Screen name="Register" component={RegisterScreen} />
         </Tab.Navigator>
@@ -69,4 +78,3 @@ export default function AppNavigator() {
   return (
     <StackNavigator />
   );
-};
