@@ -7,11 +7,11 @@ export type TabParamList = {
   Register: undefined,
 };
 
-
 export type RootStackParamList = {
   Tabs: NavigatorScreenParams<TabParamList>;
   Details: { itemId: number };
   Login: undefined;
+  Checkout: undefined;
 }
 
 export type AuthTabParamList = {
@@ -22,4 +22,5 @@ export type AuthTabParamList = {
 export type AuthStackParamList = {
   Tabs: NavigatorScreenParams<AuthTabParamList>;
   Details: { itemId: number};
+  Checkout: undefined;
 }
