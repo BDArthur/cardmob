@@ -16,7 +16,7 @@ import CartScreen from "../screens/cart/CartScreen";
 
 const AppStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
-@@ -19,53 +20,61 @@
+
 function TabNavigator() {
     return (
         <Tab.Navigator
@@ -47,7 +47,11 @@ function TabNavigator() {
               options={{title: 'Seu Carrinho'}}
             />
             <Tab.Screen name="Settings" component={HomeScreen} />
-            <Tab.Screen name="Register" component={RegisterScreen} />
+            <Tab.Screen
+              name="Register"
+              component={RegisterScreen}
+              options={{title: "Cadastrar", headerShown: true}} // novo
+            />
         </Tab.Navigator>
     );
 }
@@ -78,3 +82,4 @@ export default function AppNavigator() {
   return (
     <StackNavigator />
   );
+};
