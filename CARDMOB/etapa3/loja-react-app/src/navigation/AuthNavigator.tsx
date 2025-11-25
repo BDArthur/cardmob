@@ -8,6 +8,7 @@ import HomeScreen from "../screens/HomeScreen";
 // importar depois que implementar: DetailsScreen, SettingsScreen
 import ProfileScreen from "../screens/auth/ProfileScreen";
 import CheckoutScreen from "../screens/cart/CheckoutScreen";
+import OrderInfoScreen from "../screens/cart/OrderInfoScreen";
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 const Tab = createBottomTabNavigator<AuthTabParamList>();
@@ -43,6 +44,11 @@ function AuthStackNavigator() {
         component={CheckoutScreen}
         options={{title: 'Concluir pedido'}}
       />
+      <Stack.Screen 
+        name="OrderInfo"
+        component={OrderInfoScreen}
+        options={{title: 'Resumo do pedido'}}
+      />
     </Stack.Navigator>
   );
 }
@@ -51,4 +57,3 @@ export default function AuthNavigator() {
   return (
     <AuthStackNavigator />
   );
-};

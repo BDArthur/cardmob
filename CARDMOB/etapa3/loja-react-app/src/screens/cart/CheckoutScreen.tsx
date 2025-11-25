@@ -35,6 +35,8 @@ const CheckoutScreen = ( {navigation}: any) => {
         console.log(customerInfo);
         // navigation.navigate('Catalog');
         navigation.replace('Tabs', {screen: 'Catalog'});
+        // navigation.replace('Tabs', {screen: 'Catalog'});
+        navigation.navigate('OrderInfo');
     }
 
     return (
@@ -134,4 +136,3 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         textAlign: 'center'
     },
-});
